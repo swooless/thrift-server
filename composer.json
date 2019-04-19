@@ -1,0 +1,29 @@
+{
+  "name": "swooless/thrift-server",
+  "description": "Thrift Server By Swoole",
+  "type": "library",
+  "authors": [
+    {
+      "name": "傅双亮",
+      "email": "shuangliang.fu@baozun.com"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "Swooless\\ThriftServer\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Swooless\\ThriftServer\\Tests\\": "tests/"
+    }
+  },
+  "require": {
+    "ext-swoole": "^4.1",
+    "apache/thrift": "^0.12.0"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^7.5",
+    "swoole/ide-helper": "~4.3.0"
+  }
+}
