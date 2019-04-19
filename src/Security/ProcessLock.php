@@ -19,7 +19,12 @@ class ProcessLock
 
     public function lock(int $pid): bool
     {
-        return file_put_contents($this->file, $pid);
+        if ($pid <= 0) {
+            error_log('Abnormal pid number!');
+            return false;
+        } else {
+            return boolval(file_put_contents($this->file, $pid));
+        }
     }
 
     public function isLock(): bool
