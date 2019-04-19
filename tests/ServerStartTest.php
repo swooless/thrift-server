@@ -22,9 +22,6 @@ class ServerStartTest extends TestCase
 
         $transport = new SServerSocket('127.0.0.1', '9090');
 
-        $transport->on('receive', function () {
-            echo "receive" . PHP_EOL;
-        });
         $transport->on('start', function () {
             echo "start" . PHP_EOL;
         });
