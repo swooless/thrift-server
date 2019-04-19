@@ -2,7 +2,10 @@
 
 namespace Swooless\ThriftServer\Server;
 
+use Exception;
 use swoole_process;
+use Swooless\ThriftServer\Transport\SSocket;
+use Thrift\Protocol\TBinaryProtocol;
 use Thrift\Server\TServer;
 use Swooless\ThriftServer\Security\ProcessLock;
 
@@ -17,6 +20,25 @@ class SServer extends TServer
     {
         if (!$this->lock()->isLock()) {
             if ($this->transport_ instanceof SServerSocket) {
+                $this->transport_->on('receive', function ($server, $fd, $from_id, $data) {
+                    try {
+                        echo "from id: {$from_id}\n";
+                        $socket = $this->transport_->accept();
+                        if ($socket instanceof SSocket) {
+                            $socket->setHandle($fd);
+                            $socket->buffer = $data;
+                            $socket->server = $server;
+                            $protocol = new TBinaryProtocol($socket, false, false);
+                            $this->processor_->process($protocol, $protocol);
+                        }
+                    } catch (Exception $e) {
+                        error_log(sprintf("CODE:%s\nMESSAGE:%s\nTrace:%s\n",
+                            $e->getCode(),
+                            $e->getMessage(),
+                            $e->getTraceAsString()
+                        ));
+                    }
+                });
                 $this->transport_->listen();
             }
         } else {
@@ -46,7 +68,7 @@ class SServer extends TServer
         $this->serverName = $serverName;
     }
 
-    private function lock(): ProcessLock
+    public function lock(): ProcessLock
     {
         if (!$this->lock) {
             $this->lock = new ProcessLock($this->serverName);
